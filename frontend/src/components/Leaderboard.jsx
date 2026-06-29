@@ -8,7 +8,7 @@ export default function Leaderboard() {
 
   const fetchLeaderboard = async () => {
     try {
-      const response = await fetch('http://localhost:5001/api/leaderboard');
+      const response = await fetch('/api/leaderboard');
       if (response.ok) {
         const data = await response.json();
         setLeaderboard(data);

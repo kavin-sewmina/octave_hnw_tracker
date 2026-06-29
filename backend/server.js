@@ -26,12 +26,14 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', time: new Date() });
 });
 
-// Start Server
-async function startServer() {
-  await connectDB(MONGO_URI);
+// Connect DB on load
+connectDB(MONGO_URI);
+
+// Start Server locally if not on Vercel
+if (!process.env.VERCEL) {
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`OCTAVE Backend listening on port ${PORT}`);
   });
 }
 
-startServer();
+module.exports = app;

@@ -21,7 +21,7 @@ export default function OrganizerView({ onLogout }) {
   useEffect(() => {
     const loadCheckpoints = async () => {
       try {
-        const response = await fetch('http://localhost:5001/api/checkpoints');
+        const response = await fetch('/api/checkpoints');
         if (response.ok) {
           const data = await response.json();
           setCheckpoints(data);
@@ -37,7 +37,7 @@ export default function OrganizerView({ onLogout }) {
   const fetchParticipants = async (cpCode = selectedCp) => {
     if (!token) return;
     try {
-      const response = await fetch(`http://localhost:5001/api/checkpoint-status/${cpCode}`, {
+      const response = await fetch(`/api/checkpoint-status/${cpCode}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -149,7 +149,7 @@ export default function OrganizerView({ onLogout }) {
 
     // 2. Not in local queue, send API undo request to backend
     try {
-      const response = await fetch('http://localhost:5001/api/logs/undo', {
+      const response = await fetch('/api/logs/undo', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -186,7 +186,7 @@ export default function OrganizerView({ onLogout }) {
       syncQueue.queue = syncQueue.queue.filter(item => !(item.teamId === teamId && item.checkpointCode === selectedCp));
       syncQueue.saveQueue();
 
-      const response = await fetch('http://localhost:5001/api/logs/reset-section', {
+      const response = await fetch('/api/logs/reset-section', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -219,7 +219,7 @@ export default function OrganizerView({ onLogout }) {
       syncQueue.queue = [];
       syncQueue.saveQueue();
 
-      const response = await fetch('http://localhost:5001/api/logs/reset-all', {
+      const response = await fetch('/api/logs/reset-all', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

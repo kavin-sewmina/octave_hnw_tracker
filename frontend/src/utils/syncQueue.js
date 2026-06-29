@@ -7,7 +7,7 @@ class SyncQueue {
     this.onStatusChangeCallbacks = [];
     this.onSyncCompleteCallbacks = [];
     this.token = localStorage.getItem('octave_token') || null;
-    this.baseUrl = 'http://localhost:5001/api';
+    this.baseUrl = '/api';
   }
 
   setToken(token) {
