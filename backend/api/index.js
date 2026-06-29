@@ -21,6 +21,11 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api', apiRoutes);
 
+// Root welcome
+app.get('/', (req, res) => {
+  res.json({ message: 'OCTAVE H&W 2026 API Server is running!', health: '/health' });
+});
+
 // Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', time: new Date() });
