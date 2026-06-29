@@ -28,13 +28,15 @@ function authenticateOrganizer(req, res, next) {
 // Section definitions: code -> { requiredTaps, leg }
 const SECTIONS = {
   SWIM: { requiredTaps: 1, leg: 'Swim' },
+  RUN_CP1: { requiredTaps: 1, leg: 'Run' },
+  RUN_CP2: { requiredTaps: 1, leg: 'Run' },
   RUN: { requiredTaps: 4, leg: 'Run' },
   CYCLE: { requiredTaps: 6, leg: 'Cycle' },
   HYROX: { requiredTaps: 6, leg: 'HYROX' }
 };
 
 // The sequential order of sections
-const SECTION_ORDER = ['SWIM', 'RUN', 'CYCLE', 'HYROX'];
+const SECTION_ORDER = ['SWIM', 'RUN_CP1', 'RUN_CP2', 'RUN', 'CYCLE', 'HYROX'];
 
 // Helper: Calculate placements for completed legs
 async function getLegPlacements() {
@@ -45,8 +47,17 @@ async function getLegPlacements() {
   for (const log of logs) {
     const code = log.checkpoint.code;
     const section = SECTIONS[code];
-    if (section && log.tapNumber === section.requiredTaps) {
-      completions[section.leg].push({ teamId: log.team.toString(), timestamp: log.timestamp });
+    if (section) {
+      if (section.leg === 'Run') {
+        // Only RUN (the 4 laps) counts as completion for the Run event
+        if (code === 'RUN' && log.tapNumber === section.requiredTaps) {
+          completions.Run.push({ teamId: log.team.toString(), timestamp: log.timestamp });
+        }
+      } else {
+        if (log.tapNumber === section.requiredTaps) {
+          completions[section.leg].push({ teamId: log.team.toString(), timestamp: log.timestamp });
+        }
+      }
     }
   }
 
@@ -58,7 +69,7 @@ async function getLegPlacements() {
   const mapPlacements = (list) => {
     const map = {};
     list.forEach((item, idx) => {
-      const pts = (pointScale[idx] || 0) + 3;
+      const pts = pointScale[idx] || 0;
       map[item.teamId] = { placement: idx + 1, points: pts };
     });
     return map;
@@ -129,7 +140,46 @@ async function getTeamsStatusInternal() {
     };
 
     const swimLeg = buildLegStatus('SWIM');
-    const runLeg = buildLegStatus('RUN');
+    
+    // Custom builder for Run leg
+    const getRunLegStatus = () => {
+      const cp1Taps = sectionTaps['RUN_CP1'] || [];
+      const cp2Taps = sectionTaps['RUN_CP2'] || [];
+      const runTaps = sectionTaps['RUN'] || [];
+
+      const cp1Completed = cp1Taps.length >= SECTIONS['RUN_CP1'].requiredTaps;
+      const cp2Completed = cp2Taps.length >= SECTIONS['RUN_CP2'].requiredTaps;
+      const runCompleted = runTaps.length >= SECTIONS['RUN'].requiredTaps;
+
+      let status = 'Not Started';
+      let completedAt = null;
+      let rounds = 0;
+      let totalRounds = 4;
+
+      if (runCompleted) {
+        status = 'Completed';
+        const lastTap = runTaps.find(l => l.tapNumber === SECTIONS['RUN'].requiredTaps);
+        completedAt = lastTap ? lastTap.timestamp : null;
+        rounds = 4;
+      } else if (runTaps.length > 0) {
+        status = 'In Progress';
+        rounds = runTaps.length;
+      } else if (cp2Completed || cp1Completed || cp1Taps.length > 0 || cp2Taps.length > 0) {
+        status = 'In Progress';
+        rounds = 0;
+      }
+
+      return {
+        status,
+        rounds,
+        totalRounds,
+        completedAt,
+        cp1Completed,
+        cp2Completed
+      };
+    };
+
+    const runLeg = getRunLegStatus();
     const cycleLeg = buildLegStatus('CYCLE');
     const hyroxLeg = buildLegStatus('HYROX');
 
@@ -155,9 +205,30 @@ async function getTeamsStatusInternal() {
       progressScore = 2.0;
       lastTapTime = runLeg.completedAt;
     } else if (runLeg.status === 'In Progress') {
-      progressScore = 1.0 + (runLeg.rounds / 4) * 0.99;
-      const lastTap = sectionTaps['RUN'].find(l => l.tapNumber === runLeg.rounds);
-      lastTapTime = lastTap ? lastTap.timestamp : null;
+      let runProgress = 0;
+      if (runLeg.cp2Completed) {
+        runProgress = 0.5 + (runLeg.rounds / 4) * 0.49;
+      } else if (runLeg.cp1Completed) {
+        runProgress = 0.25;
+      } else {
+        runProgress = 0.05;
+      }
+      progressScore = 1.0 + runProgress;
+
+      // Determine last tap time for Run in progress
+      const cp1Taps = sectionTaps['RUN_CP1'] || [];
+      const cp2Taps = sectionTaps['RUN_CP2'] || [];
+      const runTaps = sectionTaps['RUN'] || [];
+      if (runTaps.length > 0) {
+        const lastTap = runTaps.find(l => l.tapNumber === runLeg.rounds);
+        lastTapTime = lastTap ? lastTap.timestamp : null;
+      } else if (cp2Taps.length > 0) {
+        lastTapTime = cp2Taps[0].timestamp;
+      } else if (cp1Taps.length > 0) {
+        lastTapTime = cp1Taps[0].timestamp;
+      } else {
+        lastTapTime = null;
+      }
     } else if (swimLeg.status === 'Completed') {
       progressScore = 1.0;
       lastTapTime = swimLeg.completedAt;
@@ -244,11 +315,18 @@ router.get('/checkpoint-status/:checkpointCode', authenticateOrganizer, async (r
       const teamIdStr = status._id.toString();
       const teamMembers = members.filter(m => m.team.toString() === teamIdStr);
 
-      // Get the leg status for this section
-      const legStatus = status.legs[section.leg];
-      const roundCounter = legStatus.rounds;
+      // Get the tap counts specifically for this checkpoint code
+      let cpTapsCount = 0;
+      if (sectionCode === 'RUN_CP1') {
+        cpTapsCount = status.legs.Run.cp1Completed ? 1 : 0;
+      } else if (sectionCode === 'RUN_CP2') {
+        cpTapsCount = status.legs.Run.cp2Completed ? 1 : 0;
+      } else {
+        cpTapsCount = status.legs[section.leg].rounds;
+      }
+
       const totalRounds = section.requiredTaps;
-      const isCompleted = legStatus.status === 'Completed';
+      const isCompleted = cpTapsCount >= totalRounds;
 
       // Check if this section is tappable:
       // 1. The section is not yet completed
@@ -256,13 +334,19 @@ router.get('/checkpoint-status/:checkpointCode', authenticateOrganizer, async (r
       let isTappable = false;
       if (!isCompleted) {
         if (sectionIdx === 0) {
-          // SWIM: always tappable if not completed
-          isTappable = roundCounter < totalRounds;
+          isTappable = true;
         } else {
           const prevSectionCode = SECTION_ORDER[sectionIdx - 1];
-          const prevLeg = SECTIONS[prevSectionCode].leg;
-          const prevStatus = status.legs[prevLeg];
-          isTappable = prevStatus.status === 'Completed' && roundCounter < totalRounds;
+          const prevSection = SECTIONS[prevSectionCode];
+          let prevCompleted = false;
+          if (prevSectionCode === 'RUN_CP1') {
+            prevCompleted = status.legs.Run.cp1Completed;
+          } else if (prevSectionCode === 'RUN_CP2') {
+            prevCompleted = status.legs.Run.cp2Completed;
+          } else {
+            prevCompleted = status.legs[prevSection.leg].status === 'Completed';
+          }
+          isTappable = prevCompleted;
         }
       }
 
@@ -270,10 +354,14 @@ router.get('/checkpoint-status/:checkpointCode', authenticateOrganizer, async (r
       let activeIndex = 1;
       if (sectionCode === 'SWIM') {
         activeIndex = 1;
+      } else if (sectionCode === 'RUN_CP1') {
+        activeIndex = 2;
+      } else if (sectionCode === 'RUN_CP2') {
+        activeIndex = 2;
       } else if (sectionCode === 'RUN') {
-        activeIndex = roundCounter < 2 ? 2 : 3; // Run A for rounds 0-1, Run B for rounds 2-3
+        activeIndex = 3;
       } else if (sectionCode === 'CYCLE') {
-        activeIndex = roundCounter < 3 ? 4 : 5; // Cycle A for rounds 0-2, Cycle B for rounds 3-5
+        activeIndex = cpTapsCount < 3 ? 4 : 5; // Cycle A for rounds 0-2, Cycle B for rounds 3-5
       } else if (sectionCode === 'HYROX') {
         activeIndex = 6;
       }
@@ -282,8 +370,19 @@ router.get('/checkpoint-status/:checkpointCode', authenticateOrganizer, async (r
       let isResetable = true;
       for (let i = sectionIdx + 1; i < SECTION_ORDER.length; i++) {
         const subCode = SECTION_ORDER[i];
-        const subLeg = SECTIONS[subCode].leg;
-        if (status.legs[subLeg].status !== 'Not Started') {
+        const subSection = SECTIONS[subCode];
+        let subStarted = false;
+        if (subCode === 'RUN_CP1') {
+          subStarted = status.legs.Run.cp1Completed;
+        } else if (subCode === 'RUN_CP2') {
+          subStarted = status.legs.Run.cp2Completed;
+        } else if (subCode === 'RUN') {
+          subStarted = status.legs.Run.rounds > 0;
+        } else {
+          subStarted = status.legs[subSection.leg].status !== 'Not Started';
+        }
+        
+        if (subStarted) {
           isResetable = false;
           break;
         }
@@ -299,7 +398,7 @@ router.get('/checkpoint-status/:checkpointCode', authenticateOrganizer, async (r
         isCompleted,
         isTappable,
         isResetable,
-        roundCounter,
+        roundCounter: cpTapsCount,
         totalRounds,
         type: checkpoint.type
       };
@@ -340,32 +439,55 @@ router.post('/logs/tap', authenticateOrganizer, async (req, res) => {
       return res.status(404).json({ error: 'Team status not found' });
     }
 
-    const legStatus = status.legs[section.leg];
-
-    // Check if already completed
-    if (legStatus.status === 'Completed') {
-      return res.status(400).json({ error: `${section.leg} is already completed` });
+    // Count current taps for this specific checkpoint
+    const currentCpLogs = await Log.countDocuments({
+      team: team._id,
+      checkpoint: checkpoint._id,
+      isUndone: false
+    });
+    
+    if (currentCpLogs >= section.requiredTaps) {
+      return res.status(400).json({ error: `${checkpoint.name} is already completed` });
     }
 
-    // Check prerequisite: previous section must be completed
+    // Check prerequisite: previous section in SECTION_ORDER must be completed
     const sectionIdx = SECTION_ORDER.indexOf(sectionCode);
     if (sectionIdx > 0) {
       const prevCode = SECTION_ORDER[sectionIdx - 1];
-      const prevLeg = SECTIONS[prevCode].leg;
-      if (status.legs[prevLeg].status !== 'Completed') {
-        return res.status(400).json({ error: `Must complete ${prevLeg} before ${section.leg}` });
+      const prevSection = SECTIONS[prevCode];
+      
+      // If the previous section belongs to a different leg, check if that leg is completed.
+      if (prevSection.leg !== section.leg) {
+        if (status.legs[prevSection.leg].status !== 'Completed') {
+          return res.status(400).json({ error: `Must complete ${prevSection.leg} before starting this section.` });
+        }
+      } else {
+        // If it's the same leg (like RUN_CP1 -> RUN_CP2 -> RUN), check if the team has completed the previous section.
+        const prevCheckpoint = await Checkpoint.findOne({ code: prevCode });
+        const prevLogsCount = prevCheckpoint ? await Log.countDocuments({
+          team: team._id,
+          checkpoint: prevCheckpoint._id,
+          isUndone: false
+        }) : 0;
+        if (prevLogsCount < prevSection.requiredTaps) {
+          return res.status(400).json({ error: `Must complete ${prevCheckpoint ? prevCheckpoint.name : prevCode} first.` });
+        }
       }
     }
 
     // Determine tap number
-    const tapNumber = legStatus.rounds + 1;
+    const tapNumber = currentCpLogs + 1;
 
     // Determine active member
     let activeIndex = 1;
     if (sectionCode === 'SWIM') {
       activeIndex = 1;
+    } else if (sectionCode === 'RUN_CP1') {
+      activeIndex = 2;
+    } else if (sectionCode === 'RUN_CP2') {
+      activeIndex = 2;
     } else if (sectionCode === 'RUN') {
-      activeIndex = tapNumber <= 2 ? 2 : 3;
+      activeIndex = 3;
     } else if (sectionCode === 'CYCLE') {
       activeIndex = tapNumber <= 3 ? 4 : 5;
     } else if (sectionCode === 'HYROX') {

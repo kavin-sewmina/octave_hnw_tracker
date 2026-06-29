@@ -44,6 +44,25 @@ async function connectDB(mongoUri) {
   try {
     await mongoose.connect(mongoUri);
     console.log('MongoDB connected successfully');
+    
+    // Check if we need to migrate checkpoints to the new 6-checkpoint schema (with RUN_CP1 and RUN_CP2)
+    const hasCp1 = await Checkpoint.findOne({ code: 'RUN_CP1' });
+    if (!hasCp1) {
+      console.log('Migrating checkpoints to 6-checkpoint schema (with RUN_CP1 and RUN_CP2)...');
+      await Checkpoint.deleteMany({});
+      
+      const checkpoints = [
+        { code: 'SWIM', name: 'Swimming', location: 'Pool', type: 'Single', requiredTaps: 1, leg: 'Swim', sortOrder: 1 },
+        { code: 'RUN_CP1', name: 'Run Checkpoint 1', location: 'Track Entry', type: 'Single', requiredTaps: 1, leg: 'Run', sortOrder: 2 },
+        { code: 'RUN_CP2', name: 'Run Checkpoint 2', location: 'Track Midpoint', type: 'Single', requiredTaps: 1, leg: 'Run', sortOrder: 3 },
+        { code: 'RUN', name: 'Running', location: 'Track', type: 'Round', requiredTaps: 4, leg: 'Run', sortOrder: 4 },
+        { code: 'CYCLE', name: 'Cycling', location: 'Cycle Track', type: 'Round', requiredTaps: 6, leg: 'Cycle', sortOrder: 5 },
+        { code: 'HYROX', name: 'HYROX Fitness', location: 'Fitness Area', type: 'Station', requiredTaps: 6, leg: 'HYROX', sortOrder: 6 }
+      ];
+      await Checkpoint.insertMany(checkpoints);
+      console.log('Checkpoints migrated successfully.');
+    }
+    
     await seedData();
   } catch (err) {
     console.error('MongoDB connection error:', err);
@@ -64,12 +83,14 @@ async function seedData() {
     await Checkpoint.deleteMany({});
     await Log.deleteMany({});
 
-    // Seed Checkpoints (4 Sections)
+    // Seed Checkpoints (6 Sections)
     const checkpoints = [
       { code: 'SWIM', name: 'Swimming', location: 'Pool', type: 'Single', requiredTaps: 1, leg: 'Swim', sortOrder: 1 },
-      { code: 'RUN', name: 'Running', location: 'Track', type: 'Round', requiredTaps: 4, leg: 'Run', sortOrder: 2 },
-      { code: 'CYCLE', name: 'Cycling', location: 'Cycle Track', type: 'Round', requiredTaps: 6, leg: 'Cycle', sortOrder: 3 },
-      { code: 'HYROX', name: 'HYROX Fitness', location: 'Fitness Area', type: 'Station', requiredTaps: 6, leg: 'HYROX', sortOrder: 4 }
+      { code: 'RUN_CP1', name: 'Run Checkpoint 1', location: 'Track Entry', type: 'Single', requiredTaps: 1, leg: 'Run', sortOrder: 2 },
+      { code: 'RUN_CP2', name: 'Run Checkpoint 2', location: 'Track Midpoint', type: 'Single', requiredTaps: 1, leg: 'Run', sortOrder: 3 },
+      { code: 'RUN', name: 'Running', location: 'Track', type: 'Round', requiredTaps: 4, leg: 'Run', sortOrder: 4 },
+      { code: 'CYCLE', name: 'Cycling', location: 'Cycle Track', type: 'Round', requiredTaps: 6, leg: 'Cycle', sortOrder: 5 },
+      { code: 'HYROX', name: 'HYROX Fitness', location: 'Fitness Area', type: 'Station', requiredTaps: 6, leg: 'HYROX', sortOrder: 6 }
     ];
 
     const seededCPs = await Checkpoint.insertMany(checkpoints);

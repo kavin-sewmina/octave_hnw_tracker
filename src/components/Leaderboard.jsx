@@ -58,7 +58,16 @@ export default function Leaderboard() {
     }
 
     if (legInfo.status === 'In Progress') {
-      const roundCount = (legName === 'Swim') ? '1/1' : `${legInfo.rounds}/${legInfo.totalRounds}`;
+      let roundCount = '';
+      if (legName === 'Swim') {
+        roundCount = '1/1';
+      } else if (legName === 'Run') {
+        if (!legInfo.cp1Completed) roundCount = 'CP 1';
+        else if (!legInfo.cp2Completed) roundCount = 'CP 2';
+        else roundCount = `L${legInfo.rounds}/4`;
+      } else {
+        roundCount = `${legInfo.rounds}/${legInfo.totalRounds}`;
+      }
       return (
         <div className="status-amber" style={{ height: '2.2rem', padding: '2px' }}>
           <span style={{ fontSize: '0.75rem', fontWeight: '700' }}>

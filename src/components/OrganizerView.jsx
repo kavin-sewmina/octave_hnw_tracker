@@ -431,7 +431,10 @@ export default function OrganizerView({ onLogout }) {
                   <div style={{ fontSize: '0.85rem', color: p.isCompleted ? 'var(--color-success)' : 'var(--text-secondary)' }}>
                     {p.isCompleted ? (
                       <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                        {p.totalRounds === 1 ? 'Completed' : 
+                        {selectedCp === 'RUN_CP1' ? 'Checkpoint 1 Covered' :
+                         selectedCp === 'RUN_CP2' ? 'Checkpoint 2 Covered' :
+                         selectedCp === 'RUN' ? 'Lap 4 Completed' :
+                         p.totalRounds === 1 ? 'Completed' : 
                          p.type === 'Station' ? `Station ${p.totalRounds} Completed` : 
                          `Lap ${p.totalRounds} Completed`}
                         <CheckCircle size={14} />
@@ -516,10 +519,18 @@ export default function OrganizerView({ onLogout }) {
                       <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                         <CheckCircle size={14} /> Completed
                       </span>
-                    ) : p.totalRounds === 1 ? (
-                      'Completed'
-                    ) : p.roundCounter === 0 ? (
-                      'Start'
+                    ) : selectedCp === 'SWIM' ? (
+                      'Swim Complete'
+                    ) : selectedCp === 'RUN_CP1' ? (
+                      'CP 1 Complete'
+                    ) : selectedCp === 'RUN_CP2' ? (
+                      'CP 2 Complete'
+                    ) : selectedCp === 'RUN' ? (
+                      p.roundCounter === 3 ? 'Run Complete' : `Lap ${p.roundCounter + 1}`
+                    ) : selectedCp === 'CYCLE' ? (
+                      p.roundCounter === 5 ? 'Cycling Complete' : `Lap ${p.roundCounter + 1}`
+                    ) : selectedCp === 'HYROX' ? (
+                      `Station ${p.roundCounter + 1} Complete`
                     ) : p.type === 'Station' ? (
                       `Station ${p.roundCounter + 1}`
                     ) : (

@@ -69,12 +69,21 @@ export default function SpectatorView() {
     }
 
     if (legInfo.status === 'In Progress') {
-      const displayRound = legName === 'Swim' ? '1/1' : `${legInfo.rounds}/${legInfo.totalRounds}`;
+      let displayStatus = '';
+      if (legName === 'Swim') {
+        displayStatus = 'Round 1/1';
+      } else if (legName === 'Run') {
+        if (!legInfo.cp1Completed) displayStatus = 'Checkpoint 1';
+        else if (!legInfo.cp2Completed) displayStatus = 'Checkpoint 2';
+        else displayStatus = `Lap ${legInfo.rounds} / 4`;
+      } else {
+        displayStatus = `Round ${legInfo.rounds}/${legInfo.totalRounds}`;
+      }
       return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', width: '100%' }}>
           <div className="status-amber" style={{ height: '3.5rem' }}>
             <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', opacity: 0.8 }}>In Progress</span>
-            <span style={{ fontSize: '1.05rem', fontWeight: '700' }}>Round {displayRound}</span>
+            <span style={{ fontSize: '1.05rem', fontWeight: '700' }}>{displayStatus}</span>
           </div>
         </div>
       );
@@ -146,7 +155,7 @@ export default function SpectatorView() {
                       <Activity size={20} />
                     </div>
                     <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Run</span>
-                    <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)' }}>(2km / 4 Laps)</span>
+                    <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)' }}>(2 CPs + 4 Laps)</span>
                   </div>
                   {renderStatusCell('Run', selectedTeam.legs.Run)}
                 </div>
