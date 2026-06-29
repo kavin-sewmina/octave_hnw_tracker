@@ -411,7 +411,7 @@ export default function OrganizerView({ onLogout }) {
             return (
               <div
                 key={p.teamId}
-                className="card"
+                className="card organizer-card"
                 style={{
                   display: 'flex',
                   justifyContent: 'space-between',
@@ -447,7 +447,7 @@ export default function OrganizerView({ onLogout }) {
                 </div>
 
                 {/* Log interaction buttons */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div className="organizer-btn-group" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   {/* Undo Button */}
                   {hasTappedAtAll && (
                     <button

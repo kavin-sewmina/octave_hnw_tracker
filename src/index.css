@@ -384,3 +384,65 @@ header {
   align-items: center;
   gap: 0.5rem;
 }
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 480px) {
+  /* Leaderboard columns scaling */
+  .leaderboard-header, .leaderboard-grid-row {
+    grid-template-columns: 22px 1fr 48px 48px 48px 48px 48px !important;
+    gap: 4px !important;
+    font-size: 0.75rem !important;
+  }
+  
+  .leaderboard-header div, .leaderboard-grid-row div {
+    font-size: 0.72rem !important;
+  }
+
+  .leaderboard-grid-row .card {
+    padding: 0.5rem 0.35rem !important;
+  }
+
+  /* Spectator columns scaling */
+  .spectator-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 0.35rem !important;
+  }
+  .spectator-grid span {
+    font-size: 0.6rem !important;
+  }
+  .spectator-grid div {
+    font-size: 0.65rem !important;
+  }
+
+  /* Organizer lists buttons scaling */
+  .organizer-btn-group button {
+    padding: 0.5rem 0.7rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  .organizer-card {
+    padding: 0.75rem 0.6rem !important;
+  }
+
+  .organizer-card h3 {
+    font-size: 0.9rem !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .leaderboard-header, .leaderboard-grid-row {
+    grid-template-columns: 20px 1fr 44px 44px 44px 44px 44px !important;
+    gap: 3px !important;
+    font-size: 0.7rem !important;
+  }
+
+  .leaderboard-header div, .leaderboard-grid-row div {
+    font-size: 0.68rem !important;
+  }
+  
+  .organizer-btn-group button {
+    padding: 0.45rem 0.55rem !important;
+    font-size: 0.7rem !important;
+  }
+}
+

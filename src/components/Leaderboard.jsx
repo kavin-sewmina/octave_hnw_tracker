@@ -90,7 +90,7 @@ export default function Leaderboard() {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           {/* Header Row */}
-          <div style={{
+          <div className="leaderboard-header" style={{
             display: 'grid',
             gridTemplateColumns: '25px 1fr 55px 55px 55px 55px 55px',
             gap: '6px',
@@ -128,7 +128,7 @@ export default function Leaderboard() {
             return (
               <div
                 key={team._id}
-                className="card"
+                className="card leaderboard-grid-row"
                 style={{
                   display: 'grid',
                   gridTemplateColumns: '25px 1fr 55px 55px 55px 55px 55px',
