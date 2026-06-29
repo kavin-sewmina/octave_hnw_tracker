@@ -4,8 +4,8 @@
   "description": "Backend for OCTAVE H&W Week 2026 Event Day Tracker",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
+    "start": "node api/index.js",
+    "dev": "nodemon api/index.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
