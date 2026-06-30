@@ -73,8 +73,8 @@ export default function SpectatorView() {
       if (legName === 'Swim') {
         displayStatus = 'Round 1/1';
       } else if (legName === 'Run') {
-        if (!legInfo.cp1Completed) displayStatus = 'Checkpoint 1';
-        else if (!legInfo.cp2Completed) displayStatus = 'Checkpoint 2';
+        if (!legInfo.cp1Completed) displayStatus = 'CP 1';
+        else if (!legInfo.cp2Completed) displayStatus = 'CP 2';
         else displayStatus = `Lap ${legInfo.rounds} / 4`;
       } else {
         displayStatus = `Round ${legInfo.rounds}/${legInfo.totalRounds}`;
