@@ -138,7 +138,7 @@ export default function SpectatorView() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem' }}>
                 {/* Swim Leg */}
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem', minHeight: '3.8rem', justifyContent: 'flex-start', textAlign: 'center', width: '100%' }}>
                     <div style={{ background: 'rgba(255, 107, 0, 0.1)', color: 'var(--color-primary)', padding: '0.5rem', borderRadius: '50%' }}>
                       <Waves size={20} />
                     </div>
@@ -150,7 +150,7 @@ export default function SpectatorView() {
 
                 {/* Run Leg */}
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem', minHeight: '3.8rem', justifyContent: 'flex-start', textAlign: 'center', width: '100%' }}>
                     <div style={{ background: 'rgba(255, 107, 0, 0.1)', color: 'var(--color-primary)', padding: '0.5rem', borderRadius: '50%' }}>
                       <Activity size={20} />
                     </div>
@@ -162,7 +162,7 @@ export default function SpectatorView() {
 
                 {/* Cycle Leg */}
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem', minHeight: '3.8rem', justifyContent: 'flex-start', textAlign: 'center', width: '100%' }}>
                     <div style={{ background: 'rgba(255, 107, 0, 0.1)', color: 'var(--color-primary)', padding: '0.5rem', borderRadius: '50%' }}>
                       <Bike size={20} />
                     </div>
@@ -174,7 +174,7 @@ export default function SpectatorView() {
 
                 {/* HYROX Leg */}
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem', minHeight: '3.8rem', justifyContent: 'flex-start', textAlign: 'center', width: '100%' }}>
                     <div style={{ background: 'rgba(255, 107, 0, 0.1)', color: 'var(--color-primary)', padding: '0.5rem', borderRadius: '50%' }}>
                       <Award size={18} />
                     </div>
