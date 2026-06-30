@@ -53,15 +53,15 @@ export default function SpectatorView() {
     if (legInfo.status === 'Completed') {
       return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', width: '100%' }}>
-          <div className="status-green" style={{ height: '3.5rem' }}>
-            <span style={{ fontSize: '1rem', fontWeight: '800' }}>
+          <div className="status-green" style={{ minHeight: '3.5rem', height: 'auto', padding: '0.25rem 0.1rem' }}>
+            <span style={{ fontSize: '0.9rem', fontWeight: '800', textAlign: 'center', lineHeight: '1.2' }}>
               {getOrdinal(legInfo.placement)} Place
             </span>
           </div>
           {legInfo.completedAt && (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem', fontSize: '0.75rem', color: 'var(--color-success)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem', fontSize: '0.72rem', color: 'var(--color-success)' }}>
               <Clock size={12} />
-              <span>{new Date(legInfo.completedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+              <span style={{ whiteSpace: 'nowrap' }}>{new Date(legInfo.completedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
             </div>
           )}
         </div>
@@ -81,15 +81,15 @@ export default function SpectatorView() {
       }
       return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', width: '100%' }}>
-          <div className="status-amber" style={{ height: '3.5rem' }}>
-            <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', opacity: 0.8 }}>In Progress</span>
-            <span style={{ fontSize: '1.05rem', fontWeight: '700' }}>{displayStatus}</span>
+          <div className="status-amber" style={{ minHeight: '3.5rem', height: 'auto', padding: '0.25rem 0.1rem' }}>
+            <span style={{ fontSize: '0.65rem', textTransform: 'uppercase', opacity: 0.8, textAlign: 'center', lineHeight: '1.2' }}>In Progress</span>
+            <span style={{ fontSize: '0.95rem', fontWeight: '700', textAlign: 'center', lineHeight: '1.2' }}>{displayStatus}</span>
           </div>
         </div>
       );
     }
 
-    return <div className="status-dash" style={{ height: '3.5rem' }}>-</div>;
+    return <div className="status-dash" style={{ minHeight: '3.5rem', height: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>-</div>;
   };
 
   return (
