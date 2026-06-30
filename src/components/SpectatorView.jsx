@@ -138,50 +138,71 @@ export default function SpectatorView() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem' }}>
                 {/* Swim Leg */}
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem', minHeight: '3.8rem', justifyContent: 'flex-start', textAlign: 'center', width: '100%' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem', minHeight: '2.8rem', justifyContent: 'flex-start', textAlign: 'center', width: '100%' }}>
                     <div style={{ background: 'rgba(255, 107, 0, 0.1)', color: 'var(--color-primary)', padding: '0.5rem', borderRadius: '50%' }}>
                       <Waves size={20} />
                     </div>
                     <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Swim</span>
-                    <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)' }}>(100m)</span>
                   </div>
                   {renderStatusCell('Swim', selectedTeam.legs.Swim)}
                 </div>
 
                 {/* Run Leg */}
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem', minHeight: '3.8rem', justifyContent: 'flex-start', textAlign: 'center', width: '100%' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem', minHeight: '2.8rem', justifyContent: 'flex-start', textAlign: 'center', width: '100%' }}>
                     <div style={{ background: 'rgba(255, 107, 0, 0.1)', color: 'var(--color-primary)', padding: '0.5rem', borderRadius: '50%' }}>
                       <Activity size={20} />
                     </div>
                     <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Run</span>
-                    <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)' }}>(2 CPs + 4 Laps)</span>
                   </div>
                   {renderStatusCell('Run', selectedTeam.legs.Run)}
                 </div>
 
                 {/* Cycle Leg */}
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem', minHeight: '3.8rem', justifyContent: 'flex-start', textAlign: 'center', width: '100%' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem', minHeight: '2.8rem', justifyContent: 'flex-start', textAlign: 'center', width: '100%' }}>
                     <div style={{ background: 'rgba(255, 107, 0, 0.1)', color: 'var(--color-primary)', padding: '0.5rem', borderRadius: '50%' }}>
                       <Bike size={20} />
                     </div>
                     <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Cycle</span>
-                    <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)' }}>(3km / 6 Laps)</span>
                   </div>
                   {renderStatusCell('Cycle', selectedTeam.legs.Cycle)}
                 </div>
 
                 {/* HYROX Leg */}
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem', minHeight: '3.8rem', justifyContent: 'flex-start', textAlign: 'center', width: '100%' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem', minHeight: '2.8rem', justifyContent: 'flex-start', textAlign: 'center', width: '100%' }}>
                     <div style={{ background: 'rgba(255, 107, 0, 0.1)', color: 'var(--color-primary)', padding: '0.5rem', borderRadius: '50%' }}>
                       <Award size={18} />
                     </div>
                     <span style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>HYROX</span>
-                    <span style={{ fontSize: '0.6rem', color: 'var(--text-secondary)' }}>(6 Stations)</span>
                   </div>
                   {renderStatusCell('HYROX', selectedTeam.legs.HYROX)}
+                </div>
+              </div>
+
+              {/* Details Section */}
+              <div style={{ borderTop: '1px dashed var(--border-color)', marginTop: '1.5rem', paddingTop: '1rem' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '0.65rem' }}>
+                  Leg Details
+                </span>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.6rem 0.5rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                    <span style={{ fontWeight: '700', color: 'var(--text-secondary)' }}>Swim:</span>
+                    <span>100m</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                    <span style={{ fontWeight: '700', color: 'var(--text-secondary)' }}>Run:</span>
+                    <span>2 CPs + 4 Laps</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                    <span style={{ fontWeight: '700', color: 'var(--text-secondary)' }}>Cycle:</span>
+                    <span>3km / 6 Laps</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                    <span style={{ fontWeight: '700', color: 'var(--text-secondary)' }}>HYROX:</span>
+                    <span>6 Stations</span>
+                  </div>
                 </div>
               </div>
             </div>

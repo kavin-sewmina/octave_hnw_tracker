@@ -369,10 +369,28 @@ export default function OrganizerView({ onLogout }) {
         >
           {checkpoints.map(cp => (
             <option key={cp._id} value={cp.code} style={{ background: 'var(--bg-card)', color: 'white' }}>
-              {cp.name} ({cp.requiredTaps === 1 ? '1 Tap' : `${cp.requiredTaps} Rounds`})
+              {cp.name}
             </option>
           ))}
         </select>
+
+        {(() => {
+          const currentCpInfo = checkpoints.find(c => c.code === selectedCp);
+          if (!currentCpInfo) return null;
+          return (
+            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem', flexWrap: 'wrap' }}>
+              <span style={{ background: 'rgba(255, 107, 0, 0.1)', color: 'var(--color-primary)', padding: '0.35rem 0.75rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                📍 {currentCpInfo.location}
+              </span>
+              <span style={{ background: 'rgba(16, 185, 129, 0.15)', color: 'var(--color-success)', padding: '0.35rem 0.75rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                ⏱️ {currentCpInfo.requiredTaps === 1 ? '1 Tap' : `${currentCpInfo.requiredTaps} Laps / Rounds`}
+              </span>
+              <span style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6', padding: '0.35rem 0.75rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                🏃 {currentCpInfo.leg} Leg
+              </span>
+            </div>
+          );
+        })()}
       </div>
 
       {/* Error displays */}
@@ -426,7 +444,7 @@ export default function OrganizerView({ onLogout }) {
                 {/* Roster detail */}
                 <div style={{ flex: 1, paddingRight: '0.5rem' }}>
                   <div style={{ fontSize: '1rem', fontWeight: 700, color: '#fff', margin: '2px 0' }}>
-                    {p.memberName} <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)' }}>({p.teamName})</span>
+                    {p.memberName.replace(/\s[A-Z]$/, '')} <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)' }}>({p.teamName})</span>
                   </div>
                   <div style={{ fontSize: '0.85rem', color: p.isCompleted ? 'var(--color-success)' : 'var(--text-secondary)' }}>
                     {p.isCompleted ? (
